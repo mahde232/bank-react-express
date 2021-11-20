@@ -51,7 +51,7 @@ export default function SpecificUser() {
                     <div><input type='button' value='Edit' onClick={() => {setEditing(!isEditing); setEditedCredit(userToShow.credit)}} /></div>
                 </div>
             }
-            <div>Is active?: {userToShow.isActive.toString()}</div>
+            <div>Is active?: {""+userToShow.isActive}</div>
         </div> : <div>Nothing to show</div>
     )
 }
