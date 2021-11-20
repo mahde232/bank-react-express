@@ -3,8 +3,6 @@ import React, { useState } from 'react'
 import './AddUser.css'
 import { useNavigate } from 'react-router-dom'
 
-const URL = `https://bankapi-server.herokuapp.com`;
-
 export default function AddUser({ informFatherOfNewUser }) {
     let navigate = useNavigate()
     const [user, setUser] = useState({
@@ -18,7 +16,7 @@ export default function AddUser({ informFatherOfNewUser }) {
     const handleInput = (e) => {
         e.target.style.border = ""
         if (e.target.name === 'cash' || e.target.name === 'credit') {
-            e.target.value = e.target.value.replace(/\D/g, '')
+            e.target.value = e.target.value.replace(/[^\d]/gi, '')
         }
         setUser((prevState) => ({ ...prevState, [e.target.name]: e.target.value }));
     }
@@ -34,13 +32,15 @@ export default function AddUser({ informFatherOfNewUser }) {
             }
         })
         if (flag) {
-            const request = await axios.post(`${URL}/users`, user)
-            if (request.status === 201) {
-                informFatherOfNewUser(request.data)
-                navigate('/')
-            }
-            else
-                alert(request.data);
+            axios.post('api/users/', user).then((response) => {
+                if (response.status === 200) {
+                    console.log(response);
+                    informFatherOfNewUser(response.data)
+                    navigate('/')
+                }
+            }).catch((err) => {
+                console.log(err);
+            })
         }
     }
 
@@ -54,10 +54,10 @@ export default function AddUser({ informFatherOfNewUser }) {
                 <input type="text" name="name" placeholder="Name" onChange={e => handleInput(e)} />
 
                 <label>Cash</label>
-                <input type="number" name="cash" placeholder="Cash" onChange={e => handleInput(e)} />
+                <input type="text" name="cash" placeholder="Cash" onChange={e => handleInput(e)} />
 
                 <label>Credit</label>
-                <input type="number" name="credit" placeholder="Credit" onChange={e => handleInput(e)} />
+                <input type="text" name="credit" placeholder="Credit" onChange={e => handleInput(e)} />
 
                 <label>Active account?</label>
                 <select name="isActive" defaultValue={-1} onChange={e => handleInput(e)}>

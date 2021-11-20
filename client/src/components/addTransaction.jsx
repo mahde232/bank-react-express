@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './addTransaction.style.css'
-
-const URL = `https://bankapi-server.herokuapp.com`;
 
 const AddTransaction = () => {
     const navigate = useNavigate();
@@ -21,7 +19,7 @@ const AddTransaction = () => {
 
     useEffect(() => {
         const getAllUsers = async () => {
-            const request = await axios.get(`${URL}/users/`)
+            const request = await axios.get(`api/users/`)
             if (request.status === 200) {
                 setUsers(request.data);
             }
@@ -32,12 +30,12 @@ const AddTransaction = () => {
         e.target.style.border = '';
         if (e.target.name === 'amount')
             e.target.value = e.target.value.replace(/[^\d]/gi, '')
-        if(e.target.name === 'transactionType' && e.target.value === 'withdrawal') {
+        if (e.target.name === 'transactionType' && e.target.value === 'withdrawal') {
             setObj(prevState => {
-                return { transactionType: prevState.transactionType, amount: prevState.amount, receiver: prevState.receiver}
+                return { transactionType: prevState.transactionType, amount: prevState.amount, receiver: prevState.receiver }
             })
             // delete transactionObj.sender;
-        } 
+        }
         setObj(prevState => (
             { ...prevState, [e.target.name]: e.target.value }
         ))
@@ -45,11 +43,11 @@ const AddTransaction = () => {
 
     const findIfUserIsActive = (idOfWhoToCheck) => {
         let userToCheck = users.find(user => {
-            if (user.id === idOfWhoToCheck)
+            if (user._id === idOfWhoToCheck)
                 return true;
             return false;
         })
-        return userToCheck.inActiveAccount;
+        return userToCheck.isActive;
     }
     const onFormSubmit = async (e) => {
         e.preventDefault();
@@ -60,13 +58,24 @@ const AddTransaction = () => {
                 isGoodToGo = false; //if empty, set isGoodToGo to false, to prevent the api call from having empty values
             }
         })
-        if(isGoodToGo) {
-            const request = await axios.post(`${URL}/transactions`, transactionObj)
-            if (request.status === 201) {
+        if (isGoodToGo) {
+            let request;
+            try {
+            if (transactionObj.transactionType === 'deposit')
+                request = await axios.post(`api/users/deposit/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
+            else if (transactionObj.transactionType === 'withdrawal')
+                request = await axios.post(`api/users/withdraw/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
+            else if (transactionObj.transactionType === 'transferBetweenAccounts')
+                request = await axios.post(`api/users/transfer/from=${transactionObj.sender}&to=${transactionObj.receiver}`, { amount: transactionObj.amount })
+            else alert('invalid transaction type')
+            if (request.status === 200) {
                 alert('transaction done');
                 navigate('/');
             }
-            else alert(request.data);
+            }
+            catch (err) {
+                console.log(err);
+            }
         }
     }
     return (
@@ -82,14 +91,17 @@ const AddTransaction = () => {
 
                 {transactionObj.transactionType === 'transferBetweenAccounts' || transactionObj.transactionType === 'deposit' ?
                     (<><div>Sender</div>
-                    <select name='sender' onChange={handleOnChange} defaultValue={-1}>
-                        <option value={-1} disabled>Choose Sender</option>
-                        {
-                            users.map(user => {
-                                return <option key={user.passportID} value={user.passportID}>{`${user.name}-ID=${user.passportID}`}</option>
-                            })
-                        }
-                    </select></>)
+                        <select name='sender' onChange={handleOnChange} defaultValue={-1}>
+                            <option value={-1} disabled>Choose Sender</option>
+                            {
+                                users.map(user => {
+                                    return findIfUserIsActive(user._id) ? 
+                                    <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
+                                    :
+                                    <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
+                                })
+                            }
+                        </select></>)
                     : ('')
                 }
                 <div>Receiver</div>
@@ -97,7 +109,10 @@ const AddTransaction = () => {
                     <option value={-1} disabled>Choose recipient</option>
                     {
                         users.map(user => {
-                            return <option key={user.passportID} value={user.passportID}>{`${user.name}-ID=${user.passportID}`}</option>
+                            return findIfUserIsActive(user._id) ? 
+                            <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
+                            :
+                            <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
                         })
                     }
                 </select>

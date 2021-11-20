@@ -6,7 +6,7 @@ export default function Table({ users }) {
     <table id="customers">
       <thead>
         <tr>
-          <th>ID (click for user page)</th>
+          <th>passportID (click for user page)</th>
           <th>Name</th>
           <th>Cash</th>
           <th>Credit</th>
@@ -17,7 +17,8 @@ export default function Table({ users }) {
         users.length === 0 ? null : (
           <tbody>
             {users.map(user => {
-              return <TableItem key={user.passportID} user={user}></TableItem>
+              console.log(user);
+              return <TableItem key={user._id} user={user}></TableItem>
             })}
           </tbody>
         )

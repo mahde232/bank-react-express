@@ -7,20 +7,19 @@ import AddUser from './components/AddUser';
 import SpecificUser from './components/SpecificUser';
 import AddTransaction from './components/addTransaction'
 
-const URL = 'https://bankapi-server.herokuapp.com'
 export default function App() {
   const [users, setUsers] = useState([])
 
   useEffect(() => {
     const getAllUsers = async () => {
-      const request = await axios.get(`${URL}/users`)
+      const request = await axios.get(`api/users/`)
       if (request.status === 200)
         setUsers(request.data)
       else
         console.log('Error Fetching Data', request);
     }
     getAllUsers()
-  }, [])
+  },[])
 
   const addNewUser = (userObj) => {
     setUsers([...users, userObj])

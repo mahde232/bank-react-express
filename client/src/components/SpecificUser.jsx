@@ -2,18 +2,16 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useLocation } from 'react-router-dom'
 
-const URL = 'https://bankapi-server.herokuapp.com'
-
 export default function SpecificUser() {
     const [isEditing, setEditing] = useState(false)
     const [editedCredit, setEditedCredit] = useState('')
     const [userToShow, setUserToShow] = useState(null);
     const location = useLocation();
-    const passportID = location.pathname.split('/')[2];
+    const id = location.pathname.split('/')[2];
 
     useEffect(() => {
         const getSpecificUserData = async () => {
-            const request = await axios.get(`${URL}/users/${passportID}`)
+            const request = await axios.get(`api/users/id=${id}`)
             if (request.status === 200) {
                 setUserToShow(request.data);
             }
@@ -24,7 +22,7 @@ export default function SpecificUser() {
     const updateCredit = async (e) => {
         if (editedCredit.length > 0) {
             if(editedCredit >= 0) {
-                const response = await axios.post(`${URL}/updateCredit/${passportID}`, {credit: editedCredit})
+                const response = await axios.put(`api/users/id=${id}`, {credit: editedCredit})
                 if (response.status === 201) {
                     setEditing(false)
                     setUserToShow({...userToShow,credit: editedCredit})
@@ -44,7 +42,7 @@ export default function SpecificUser() {
             <div>Cash: {userToShow.cash}</div>
             {isEditing ?
                 <div style={{ display: 'flex', justifyContent: 'left' }}>
-                    <div>Credit: <input type='number' value={editedCredit} onChange={(e) => setEditedCredit(e.target.value)}/></div>
+                    <div>Credit: <input type='text' value={editedCredit} onChange={(e) => setEditedCredit(e.target.value.replace(/[^\d]/gi, ''))}/></div>
                     <div><input type='button' value='Done' onClick={updateCredit} /></div>
                 </div>
                 :

@@ -12,11 +12,11 @@ router.get('/', (req, res) => { //GetAllUsers
     userController.deleteUser(req, res);
 }).put('/id=:id', (req, res) => { //Update whole user
     userController.updateUser(req, res);
-}).put('/deposit/id=:id', (req, res) => { //deposit
+}).post('/deposit/id=:id', (req, res) => { //deposit
     userController.addCashToUser(req, res);
-}).put('/withdraw/id=:id', (req, res) => { //withdraw
+}).post('/withdraw/id=:id', (req, res) => { //withdraw
     userController.removeCashFromUser(req, res);
-}).put('/transfer/from=:from&to=:to', (req, res) => { //withdraw
+}).post('/transfer/from=:from&to=:to', (req, res) => { //withdraw
     userController.transfer(req, res);
 })
 
