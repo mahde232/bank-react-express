@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import './addTransaction.style.css'
+import { getAllUsersDAL, addCashToUserDAL, removeCashFromUserDAL, transferFromToDAL } from './DAL/users.DAL'
 
 const AddTransaction = () => {
     const navigate = useNavigate();
@@ -19,7 +19,8 @@ const AddTransaction = () => {
 
     useEffect(() => {
         const getAllUsers = async () => {
-            const request = await axios.get(`api/users/`)
+            // const request = await axios.get(`api/users/`)
+            const request = await getAllUsersDAL();
             if (request.status === 200) {
                 setUsers(request.data);
             }
@@ -61,17 +62,20 @@ const AddTransaction = () => {
         if (isGoodToGo) {
             let request;
             try {
-            if (transactionObj.transactionType === 'deposit')
-                request = await axios.post(`api/users/deposit/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
-            else if (transactionObj.transactionType === 'withdrawal')
-                request = await axios.post(`api/users/withdraw/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
-            else if (transactionObj.transactionType === 'transferBetweenAccounts')
-                request = await axios.post(`api/users/transfer/from=${transactionObj.sender}&to=${transactionObj.receiver}`, { amount: transactionObj.amount })
-            else alert('invalid transaction type')
-            if (request.status === 200) {
-                alert('transaction done');
-                navigate('/');
-            }
+                if (transactionObj.transactionType === 'deposit')
+                    request = await addCashToUserDAL(transactionObj.receiver, { amount: transactionObj.amount })
+                // request = await axios.post(`api/users/deposit/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
+                else if (transactionObj.transactionType === 'withdrawal')
+                    request = removeCashFromUserDAL(transactionObj.receiver, { amount: transactionObj.amount })
+                // request = await axios.post(`api/users/withdraw/id=${transactionObj.receiver}`, { amount: transactionObj.amount })
+                else if (transactionObj.transactionType === 'transferBetweenAccounts')
+                    request = await transferFromToDAL(transactionObj.sender, transactionObj.receiver, { amount: transactionObj.amount })
+                // request = await axios.post(`api/users/transfer/from=${transactionObj.sender}&to=${transactionObj.receiver}`, { amount: transactionObj.amount })
+                else alert('invalid transaction type')
+                if (request.status === 200) {
+                    alert('transaction done');
+                    navigate('/');
+                }
             }
             catch (err) {
                 console.log(err);
@@ -95,10 +99,10 @@ const AddTransaction = () => {
                             <option value={-1} disabled>Choose Sender</option>
                             {
                                 users.map(user => {
-                                    return findIfUserIsActive(user._id) ? 
-                                    <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
-                                    :
-                                    <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
+                                    return findIfUserIsActive(user._id) ?
+                                        <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
+                                        :
+                                        <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
                                 })
                             }
                         </select></>)
@@ -109,10 +113,10 @@ const AddTransaction = () => {
                     <option value={-1} disabled>Choose recipient</option>
                     {
                         users.map(user => {
-                            return findIfUserIsActive(user._id) ? 
-                            <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
-                            :
-                            <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
+                            return findIfUserIsActive(user._id) ?
+                                <option key={user._id} value={user._id}>{`${user.name}-ID=${user.passportID}`}</option>
+                                :
+                                <option key={user._id} value={user._id} disabled >{`${user.name}-ID=${user.passportID}`}</option>
                         })
                     }
                 </select>

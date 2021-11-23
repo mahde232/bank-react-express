@@ -1,4 +1,3 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import Table from './components/Table'
 import Nav from './components/Nav'
@@ -6,13 +5,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AddUser from './components/AddUser';
 import SpecificUser from './components/SpecificUser';
 import AddTransaction from './components/addTransaction'
+import {getAllUsersDAL} from './components/DAL/users.DAL'
 
 export default function App() {
   const [users, setUsers] = useState([])
 
   useEffect(() => {
     const getAllUsers = async () => {
-      const request = await axios.get(`api/users/`)
+      // const request = await axios.get(`api/users/`)
+      const request = await getAllUsersDAL()
       if (request.status === 200)
         setUsers(request.data)
       else

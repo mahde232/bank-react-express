@@ -1,7 +1,8 @@
-import axios from 'axios'
 import React, { useState } from 'react'
 import './AddUser.css'
 import { useNavigate } from 'react-router-dom'
+// import * as usersDAL from './DAL/users.DAL'
+import {addNewUserDAL} from './DAL/users.DAL'
 
 export default function AddUser({ informFatherOfNewUser }) {
     let navigate = useNavigate()
@@ -32,7 +33,8 @@ export default function AddUser({ informFatherOfNewUser }) {
             }
         })
         if (flag) {
-            axios.post('api/users/', user).then((response) => {
+            // axios.post('api/users/', user).then((response) => {
+            addNewUserDAL(user).then((response) => {
                 if (response.status === 200) {
                     console.log(response);
                     informFatherOfNewUser(response.data)

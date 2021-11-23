@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useLocation } from 'react-router-dom'
+import {getSpecificUserDAL, updateUserDAL} from './DAL/users.DAL'
 
 export default function SpecificUser() {
     const [isEditing, setEditing] = useState(false)
@@ -11,7 +11,10 @@ export default function SpecificUser() {
 
     useEffect(() => {
         const getSpecificUserData = async () => {
-            const request = await axios.get(`http://localhost:${process.env.PORT || 3000}/api/users/id=${id}`)
+            const request = await getSpecificUserDAL(id); //best practise
+            // const request = await axios.get(`http://localhost:${process.env.PORT || 8000}/api/users/id=${id}`) //hack/fix to make it work, not best practise
+            // const request = await axios.get(`api/users/id=${id}`) //first version, had problems with path
+            console.log('request=',request);
             if (request.status === 200) {
                 setUserToShow(request.data);
             }
@@ -22,7 +25,8 @@ export default function SpecificUser() {
     const updateCredit = async (e) => {
         if (editedCredit.length > 0) {
             if(editedCredit >= 0) {
-                const response = await axios.put(`http://localhost:${process.env.PORT || 3000}/api/users/id=${id}`, {credit: editedCredit})
+                // const response = await axios.put(`http://localhost:${process.env.PORT || 8000}/api/users/id=${id}`, {credit: editedCredit})
+                const response = await updateUserDAL(id, {credit: editedCredit})
                 if (response.status === 201) {
                     setEditing(false)
                     setUserToShow({...userToShow,credit: editedCredit})
