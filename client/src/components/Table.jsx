@@ -1,8 +1,10 @@
 import React from 'react'
 import './Table.css'
 import TableItem from './TableItem'
+import Nav from './Nav'
 export default function Table({ users }) {
-  return (
+  return (<>
+    {/* <Nav/> */}
     <table id="customers">
       <thead>
         <tr>
@@ -24,5 +26,6 @@ export default function Table({ users }) {
         )
       }
     </table>
+    </>
   )
 }
